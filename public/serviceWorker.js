@@ -33,4 +33,32 @@ self.addEventListener('activate', (e) => { //eslint-disable-line
 
 self.addEventListener('fetch', (e) => { //eslint-disable-line
   console.log("[Service worker] fetching");
+  e.respondWith(
+    caches.match(e.request)
+    .then((response) => {
+      if(response) {
+        console.log("[Service worker] found in cache", e.request.url);
+        return response;
+      }
+      const requestClone = e.request.clone();
+      fetch(requestClone)
+        .then((response) => {
+          if(!response) {
+            console.log("[Service worker]: no response");
+            return response;
+          }
+          const responseClone = response.clone();
+          caches.open(cacheName)
+          .then((cache) => {
+            console.log("[Service Worker] caching the response received", e.request.url);
+            cache.put(e.request, responseClone);;
+            return response;
+          })
+        })
+        .catch((e) => {
+          console.log("[Service Worker] error fetching & caching the response", e);
+          return {};
+        })
+    })
+  )
 });
