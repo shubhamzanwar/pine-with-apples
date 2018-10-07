@@ -4,7 +4,7 @@ import ReactDOM from 'react-dom';
 
 ReactDOM.render(
   <div>
-        New page
+      Home page
   </div>,
   document.getElementById('root'),
 );
